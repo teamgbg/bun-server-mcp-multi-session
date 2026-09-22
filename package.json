@@ -1,0 +1,185 @@
+{
+  "_generated": {
+    "system": "package-json@1.0.0",
+    "status": "generated",
+    "edit": "edit src/ — dependencies and exports derive from imports; everything else preserved"
+  },
+  "name": "@teamscala/mcp-multi-session",
+  "capability": "MCP multi-session surface: bounded, named, retrying MCP server session manager, single sanctioned MCP session lifecycle.",
+  "tier": "server",
+  "type": "module",
+  "version": "1.3.125",
+  "description": "MCP multi-session surface: bounded, named, retrying MCP server session manager, single sanctioned MCP session lifecycle.",
+  "imports": {
+    "#mcp-multi-session/*": "./src/*",
+    "#mcp-multi-session/*.ts": "./src/*.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "*",
+    "@teamscala/cache": "*",
+    "@teamscala/db": "*",
+    "@teamscala/logger": "*",
+    "@teamscala/os": "*",
+    "@teamscala/proc-walker": "*",
+    "@teamscala/retry": "*",
+    "@teamscala/timing": "*"
+  },
+  "devDependencies": {
+    "bun-types": "*",
+    "@happy-dom/global-registrator": "*",
+    "@testing-library/react": "*"
+  },
+  "exports": {
+    "./caller-context": {
+      "types": "./src/caller-context.d.ts",
+      "default": "./src/caller-context.ts"
+    },
+    "./caller-context.ts": {
+      "types": "./src/caller-context.d.ts",
+      "default": "./src/caller-context.ts"
+    },
+    "./caller-label/caller-cache": {
+      "types": "./src/caller-label/caller-cache.d.ts",
+      "default": "./src/caller-label/caller-cache.ts"
+    },
+    "./caller-label/caller-cache.ts": {
+      "types": "./src/caller-label/caller-cache.d.ts",
+      "default": "./src/caller-label/caller-cache.ts"
+    },
+    "./caller-label/get-pid-from-port": {
+      "types": "./src/caller-label/get-pid-from-port.d.ts",
+      "default": "./src/caller-label/get-pid-from-port.ts"
+    },
+    "./caller-label/get-pid-from-port.ts": {
+      "types": "./src/caller-label/get-pid-from-port.d.ts",
+      "default": "./src/caller-label/get-pid-from-port.ts"
+    },
+    "./caller-label/orch-session-override": {
+      "types": "./src/caller-label/orch-session-override.d.ts",
+      "default": "./src/caller-label/orch-session-override.ts"
+    },
+    "./caller-label/orch-session-override.ts": {
+      "types": "./src/caller-label/orch-session-override.d.ts",
+      "default": "./src/caller-label/orch-session-override.ts"
+    },
+    "./caller-label/resolve-caller-label": {
+      "types": "./src/caller-label/resolve-caller-label.d.ts",
+      "default": "./src/caller-label/resolve-caller-label.ts"
+    },
+    "./caller-label/resolve-caller-label.ts": {
+      "types": "./src/caller-label/resolve-caller-label.d.ts",
+      "default": "./src/caller-label/resolve-caller-label.ts"
+    },
+    "./caller-label/resolve-orchestrator-identity": {
+      "types": "./src/caller-label/resolve-orchestrator-identity.d.ts",
+      "default": "./src/caller-label/resolve-orchestrator-identity.ts"
+    },
+    "./caller-label/resolve-orchestrator-identity.ts": {
+      "types": "./src/caller-label/resolve-orchestrator-identity.d.ts",
+      "default": "./src/caller-label/resolve-orchestrator-identity.ts"
+    },
+    "./caller-label/types": {
+      "types": "./src/caller-label/types.d.ts",
+      "default": "./src/caller-label/types.ts"
+    },
+    "./caller-label/types.ts": {
+      "types": "./src/caller-label/types.d.ts",
+      "default": "./src/caller-label/types.ts"
+    },
+    "./caller-label/walk-to-orch-session": {
+      "types": "./src/caller-label/walk-to-orch-session.d.ts",
+      "default": "./src/caller-label/walk-to-orch-session.ts"
+    },
+    "./caller-label/walk-to-orch-session.ts": {
+      "types": "./src/caller-label/walk-to-orch-session.d.ts",
+      "default": "./src/caller-label/walk-to-orch-session.ts"
+    },
+    "./caller-label/walk-to-orchestrator-binary": {
+      "types": "./src/caller-label/walk-to-orchestrator-binary.d.ts",
+      "default": "./src/caller-label/walk-to-orchestrator-binary.ts"
+    },
+    "./caller-label/walk-to-orchestrator-binary.ts": {
+      "types": "./src/caller-label/walk-to-orchestrator-binary.d.ts",
+      "default": "./src/caller-label/walk-to-orchestrator-binary.ts"
+    },
+    "./caller-tier": {
+      "types": "./src/caller-tier.d.ts",
+      "default": "./src/caller-tier.ts"
+    },
+    "./caller-tier.ts": {
+      "types": "./src/caller-tier.d.ts",
+      "default": "./src/caller-tier.ts"
+    },
+    "./configure": {
+      "types": "./src/configure.d.ts",
+      "default": "./src/configure.ts"
+    },
+    "./configure.ts": {
+      "types": "./src/configure.d.ts",
+      "default": "./src/configure.ts"
+    },
+    "./create-mcp-route": {
+      "types": "./src/create-mcp-route.d.ts",
+      "default": "./src/create-mcp-route.ts"
+    },
+    "./create-mcp-route.ts": {
+      "types": "./src/create-mcp-route.d.ts",
+      "default": "./src/create-mcp-route.ts"
+    },
+    "./mcp-client/call-mcp-server": {
+      "types": "./src/mcp-client/call-mcp-server.d.ts",
+      "default": "./src/mcp-client/call-mcp-server.ts"
+    },
+    "./mcp-client/call-mcp-server.ts": {
+      "types": "./src/mcp-client/call-mcp-server.d.ts",
+      "default": "./src/mcp-client/call-mcp-server.ts"
+    },
+    "./mcp-client/call-mcp-server-raw": {
+      "types": "./src/mcp-client/call-mcp-server-raw.d.ts",
+      "default": "./src/mcp-client/call-mcp-server-raw.ts"
+    },
+    "./mcp-client/call-mcp-server-raw.ts": {
+      "types": "./src/mcp-client/call-mcp-server-raw.d.ts",
+      "default": "./src/mcp-client/call-mcp-server-raw.ts"
+    },
+    "./mcp-client/get-mcp-server-url": {
+      "types": "./src/mcp-client/get-mcp-server-url.d.ts",
+      "default": "./src/mcp-client/get-mcp-server-url.ts"
+    },
+    "./mcp-client/get-mcp-server-url.ts": {
+      "types": "./src/mcp-client/get-mcp-server-url.d.ts",
+      "default": "./src/mcp-client/get-mcp-server-url.ts"
+    },
+    "./mcp-client/is-mcp-configured": {
+      "types": "./src/mcp-client/is-mcp-configured.d.ts",
+      "default": "./src/mcp-client/is-mcp-configured.ts"
+    },
+    "./mcp-client/is-mcp-configured.ts": {
+      "types": "./src/mcp-client/is-mcp-configured.d.ts",
+      "default": "./src/mcp-client/is-mcp-configured.ts"
+    },
+    "./mcp-client/require-env": {
+      "types": "./src/mcp-client/require-env.d.ts",
+      "default": "./src/mcp-client/require-env.ts"
+    },
+    "./mcp-client/require-env.ts": {
+      "types": "./src/mcp-client/require-env.d.ts",
+      "default": "./src/mcp-client/require-env.ts"
+    },
+    "./mcp-client/types": {
+      "types": "./src/mcp-client/types.d.ts",
+      "default": "./src/mcp-client/types.ts"
+    },
+    "./mcp-client/types.ts": {
+      "types": "./src/mcp-client/types.d.ts",
+      "default": "./src/mcp-client/types.ts"
+    }
+  },
+  "repository": "https://github.com/teamgbg/bun-server-mcp-multi-session",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
+}
