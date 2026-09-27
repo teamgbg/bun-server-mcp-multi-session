@@ -26,71 +26,20 @@ const noopLogger: InjectedLogger = {
 	debug: () => {},
 };
 
-export type InjectedFetch = (
-	serviceName: string,
-	url: string,
-	init: RequestInit,
-	fallback?: () => Response | Promise<Response>,
-) => Promise<Response>;
-
-const noopFetch: InjectedFetch = (_n, url, init) => fetch(url, init);
-
 // 3. Module-level state. The logger keeps the default singleton's identity
 //    for the process lifetime (capture invariant,
 //    reference/configured-primitives.md): modules capture
 //    `const logger = getLogger()` at import time — BEFORE the bootloader
 //    calls configure() — so configure() MUTATES it in place, never rebinds
-//    it. Value-typed state (_fetch, urls, tokens) rebinds; its getters are
-//    called at call sites only, never captured at module scope.
+//    it.
 const _logger: InjectedLogger = noopLogger;
-let _fetch: InjectedFetch = noopFetch;
-let _mcpServerUrl: string | undefined;
-let _gatewayToken: string | undefined;
 
 // 4. Bootloader calls this exactly once before any tier-1+ code runs.
-export function configure(opts: {
-	logger?: InjectedLogger;
-	fetch?: InjectedFetch;
-	/**
-	 * Bearer token for the dev MCP gateway. Injected, never read from the
-	 * environment: it is a CREDENTIAL, and `credentials-only-in-secret-rows`
-	 * plus `configured-primitives` together mean it reaches this primitive from
-	 * its secret row via the bootloader, not from ambient process state.
-	 */
-	gatewayToken?: string;
-}): void {
+export function configure(opts: { logger?: InjectedLogger }): void {
 	if (opts.logger) Object.assign(_logger, opts.logger);
-	if (opts.fetch) _fetch = opts.fetch;
-	if (opts.mcpServerUrl !== undefined) _mcpServerUrl = opts.mcpServerUrl;
-	if (opts.gatewayToken !== undefined) _gatewayToken = opts.gatewayToken;
 }
 
 // 5. Internal getters — ALL mcp-multi-session call sites use these.
 export function getLogger(): InjectedLogger {
 	return _logger;
-}
-
-export function getMcpServerUrl(): string | undefined {
-	return _mcpServerUrl;
-}
-
-/**
- * Bearer token for the dev MCP gateway (bootloader-injected).
- *
- * Undefined when uninjected, which the callers send as an unauthenticated
- * request — the gateway rejects it, and a 401 naming the missing injection is
- * a far better failure than a token silently sourced from ambient process
- * state that no audit of the registry can see.
- */
-export function getGatewayToken(): string | undefined {
-	return _gatewayToken;
-}
-
-export function resilientFetch(
-	serviceName: string,
-	url: string,
-	init: RequestInit,
-	fallback?: () => Response | Promise<Response>,
-): Promise<Response> {
-	return _fetch(serviceName, url, init, fallback);
 }
