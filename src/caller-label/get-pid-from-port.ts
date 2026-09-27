@@ -10,7 +10,7 @@
  * overhead for callers that don't carry x-caller-orchestrator-session).
  */
 
-import { findPidListeningOnPort } from "@teamscala/proc-walker/socket-peer";
+import { findPidListeningOnPort } from "@teamscala/proc-walker";
 
 export async function getPidFromPort(port: number): Promise<number | null> {
 	return findPidListeningOnPort(port);

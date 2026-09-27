@@ -11,16 +11,16 @@
  */
 
 import { ORCHESTRATOR_ENV } from "@teamscala/os/contracts/mcp";
-import { readProcess } from "@teamscala/proc-walker/walk";
+import { readProcess } from "@teamscala/proc-walker";
 
 export async function walkToOrchSession(startPid: number): Promise<string | null> {
 	let pid = startPid;
 	const visited = new Set<number>();
 	while (pid > 1 && !visited.has(pid)) {
 		visited.add(pid);
-		const record = await readProcess(pid);
+		const record = readProcess(pid);
 		if (!record) break; // process gone mid-walk
-		const sessionId = record.environ.get(ORCHESTRATOR_ENV.SESSION_ID);
+		const sessionId = record.environ[ORCHESTRATOR_ENV.SESSION_ID];
 		if (sessionId) return sessionId;
 		if (record.ppid === pid) break;
 		pid = record.ppid;

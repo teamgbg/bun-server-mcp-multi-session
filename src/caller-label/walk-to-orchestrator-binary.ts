@@ -18,7 +18,7 @@
  * recognized CLI — e.g. curl, internal background task).
  */
 
-import { readProcess } from "@teamscala/proc-walker/walk";
+import { readProcess } from "@teamscala/proc-walker";
 
 const ORCHESTRATOR_BINARY_BASENAMES = new Set([
 	"claude",
@@ -39,7 +39,7 @@ export async function walkToOrchestratorBinary(
 	const visited = new Set<number>();
 	while (pid > 1 && !visited.has(pid)) {
 		visited.add(pid);
-		const record = await readProcess(pid);
+		const record = readProcess(pid);
 		if (!record) break;
 		if (record.exe) {
 			const base = record.exe.split("/").pop() ?? "";

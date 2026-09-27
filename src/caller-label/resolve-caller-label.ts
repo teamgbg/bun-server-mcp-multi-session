@@ -27,7 +27,7 @@ import type { CallerInfo } from "./types.ts";
 import { walkToOrchSession } from "./walk-to-orch-session.ts";
 import { walkToOrchestratorBinary } from "./walk-to-orchestrator-binary.ts";
 import { resolveOrchestratorIdentity } from "./resolve-orchestrator-identity.ts";
-import { readProcess } from "@teamscala/proc-walker/walk";
+import { readProcess } from "@teamscala/proc-walker";
 
 const logger = getLogger();
 
@@ -70,7 +70,7 @@ async function resolveCallerLabelUncached(
 		// `tmux:%<pane>` even when SCALA_ORCH_SESSION_ID is unset (e.g. a
 		// non-POSIX shell that never sourced /etc/profile.d) — closing the path
 		// where a scrubbed server env left a lane with NO resolvable identity.
-		const tmuxPane = (await readProcess(pid))?.environ.get("TMUX_PANE");
+		const tmuxPane = readProcess(pid)?.environ["TMUX_PANE"];
 		const resolved = resolveOrchestratorIdentity(tmuxPane, orchSession, (msg) =>
 			logger.warn(`[caller-label] ${msg}`),
 		);

@@ -37,14 +37,13 @@ mock.module("./walk-to-orch-session.ts", () => ({
 }));
 // readProcess is the @teamscala/proc-walker surface resolve-caller-label reads
 // TMUX_PANE through (proc-walker-is-the-only-proc-walker). Mocked so the
-// canonical-wins wiring is exercised without a live /proc/<pid>/environ.
-mock.module("@teamscala/proc-walker/walk", () => ({
+// canonical-wins wiring is exercised without a live /proc/<pid>/environ —
+// synchronously, as the napi readProcess is, with environ a plain object.
+mock.module("@teamscala/proc-walker", () => ({
 	readProcess: mock(() =>
-		Promise.resolve(
-			mockTmuxPane
-				? ({ environ: new Map([["TMUX_PANE", mockTmuxPane]]) } as never)
-				: null,
-		),
+		mockTmuxPane
+			? ({ environ: { TMUX_PANE: mockTmuxPane } } as never)
+			: null,
 	),
 }));
 
