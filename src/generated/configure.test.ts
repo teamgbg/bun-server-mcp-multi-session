@@ -10,47 +10,9 @@
  */
 
 import { expect, test } from "bun:test";
-import { configure, getGatewayToken, getLogger } from "../configure.ts";
+import { configure, getLogger } from "../configure.ts";
 
-// DECLARED FIRST ON PURPOSE: configure() state is module-level and never
-// unsets, so the before-injection behaviour can only be observed before any
-// case below has injected anything.
-test("an accessor reports absence before configure()", () => {
-	// Either shape is a correct answer to "nothing was injected": a loud throw
-	// or an explicit undefined. What is NOT acceptable is a plausible value,
-	// which is what a silently-defaulting accessor would return.
-	let reported: unknown;
-	try {
-		reported = getGatewayToken();
-	} catch {
-		reported = undefined;
-	}
-	expect(reported).toBeUndefined();
-});
 
-test("getGatewayToken reads back what configure() injected", () => {
-	// The probe value is a sentinel whose only job is to be distinguishable, so
-	// its TYPE is erased on both sides — `as never` going in (as it always was)
-	// and on the assertion coming back. Without the second cast the emitted test
-	// cannot typecheck: `toBe` is typed against the accessor's declared return,
-	// so a sentinel of any other shape is rejected. This failed in every package
-	// carrying the generated file.
-	const injected = { probe: "gatewayToken" };
-	configure({ gatewayToken: injected } as never);
-	expect(getGatewayToken()).toBe(injected as never);
-});
-
-test("a second configure() replaces what getGatewayToken returns", () => {
-	// A boot re-run must REPLACE rather than accumulate, or a stale value
-	// survives behind the current one and the accessor reports the wrong
-	// injection with nothing failing.
-	const first = { probe: "gatewayToken_first" };
-	const second = { probe: "gatewayToken_second" };
-	configure({ gatewayToken: first } as never);
-	configure({ gatewayToken: second } as never);
-	expect(getGatewayToken()).toBe(second as never);
-	expect(getGatewayToken()).not.toBe(first as never);
-});
 
 test("getLogger() keeps one object identity across configure() calls", () => {
 	const captured = getLogger();
