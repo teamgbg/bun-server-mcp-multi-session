@@ -179,8 +179,6 @@ export type RequestHandler = (
 ) => Promise<unknown> | unknown;
 
 export interface McpRouteConfig {
-	serverInfo: { name: string; version: string };
-	capabilities: Record<string, unknown>;
 	requestHandlers: Array<{
 		method: string;
 		handler: RequestHandler;
