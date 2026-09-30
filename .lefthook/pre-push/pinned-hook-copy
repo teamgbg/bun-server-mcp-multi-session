@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# @system codegen
+# @status generated
+# @edit change codegen_output 'all-repos-lefthook', then regenerate
+#
+# The fail-closed door: refuse any push whose repo does not carry the pinned
+# guard-hook-transport copy. WHY IT EXISTS: lefthook's remote fetch is
+# fail-OPEN (measured 2026-09-28) — a failed clone or a pin that resolves to
+# nothing logs and continues, and the pinned config's scripts then resolve to
+# missing files, which lefthook also logs and CONTINUES: every pre-push rule
+# skipped in silence. That is the same silent-skip class as the working-tree
+# stub this pin replaces, arriving by the other door.
+#
+# WHY A SCRIPT: lefthook skips a COMMAND on a tag-only push ("no matching push
+# files"; measured 2026-09-27) and a tag-only push is a publish push — the one
+# that must not sail through unguarded. A script fires unconditionally.
+#
+# WHY THE PINNED REF AND NOT A NAME OR A BARE GLOB: the installed directory
+# is lefthook's own derivation (<url-basename>-<ref>); naming it here would
+# spell an identity the next bump invalidates. But the door's FIRST shape
+# globbed over EVERY installed copy, and lefthook keeps old copies when the
+# pin moves (each ref fetches into its own sibling directory, measured
+# 2026-09-29, rust-foundation-proc-walker: the 0.1.0 copy satisfied the door
+# while the repo's lefthook.yml already pinned 0.1.1) — so a bump whose 0.1.1
+# fetch FAILED (network, ref typo, refetch: false) would be waved through on
+# the stale 0.1.0 copy: the exact fail-open this door exists to prevent,
+# arriving through the breadth of its own glob. The door therefore reads the
+# ref from THIS repo's own lefthook.yml (no identity is spelled, a bump needs
+# no edit here) and accepts only the copy for THAT ref; nothing resolves →
+# refuse, so a failed fetch refuses instead of passing.
+set -u
+
+remotes_dir="$(git rev-parse --git-dir 2>/dev/null)/info/lefthook-remotes"
+pinned_ref="$(sed -n 's/^[[:space:]]*ref:[[:space:]]*//p' lefthook.yml 2>/dev/null | head -1)"
+if [ -z "$pinned_ref" ]; then
+  printf 'REFUSED: this repo'"'"'s lefthook.yml declares no remotes ref, so the pinned guard-hook-transport copy cannot be named — refusing rather than passing a push whose pinned state cannot be verified\n' >&2
+  printf 'Run `lefthook install` in this repo and push again; without the pinned copy this push runs NO guard at all.\n' >&2
+  exit 1
+fi
+missing=""
+for required in \
+  .lefthook/pre-commit/scala-guard \
+  .lefthook/prepare-commit-msg/co-pane \
+  .lefthook/pre-push/scala-guard; do
+  found=""
+  for copy in "$remotes_dir"/*-"$pinned_ref"/"$required"; do
+    if [ -f "$copy" ]; then found=1; break; fi
+  done
+  if [ -z "$found" ]; then missing="$missing $required"; fi
+done
+
+if [ -n "$missing" ]; then
+  printf 'REFUSED: the pinned guard-hook-transport copy (ref %s) is not installed — missing under %s:%s\n' \
+    "$pinned_ref" "$remotes_dir" "$missing" >&2
+  printf 'Run `lefthook install` in this repo and push again. Without the pinned copy this push runs NO guard at all, and lefthook would have let it through silently.\n' >&2
+  exit 1
+fi

@@ -37,13 +37,16 @@ mock.module("./walk-to-orch-session.ts", () => ({
 }));
 // readProcess is the @teamscala/proc-walker surface resolve-caller-label reads
 // TMUX_PANE through (proc-walker-is-the-only-proc-walker). Mocked so the
-// canonical-wins wiring is exercised without a live /proc/<pid>/environ —
-// synchronously, as the napi readProcess is, with environ a plain object.
+// canonical-wins wiring is exercised without a live /proc/<pid>/environ.
+// The shape is the INSTALLED declaration's, not an approximation: the package
+// exports only "." (no /walk subpath), readProcess is SYNCHRONOUS, and
+// environ is a plain object — its own docs record that "a JS Map over FFI adds
+// no semantics". A mock that drifted from all three made this suite pass
+// vacuously: it never intercepted the real import, so the canonical-wins
+// assertion it exists to pin was never exercised.
 mock.module("@teamscala/proc-walker", () => ({
 	readProcess: mock(() =>
-		mockTmuxPane
-			? ({ environ: { TMUX_PANE: mockTmuxPane } } as never)
-			: null,
+		mockTmuxPane ? ({ environ: { TMUX_PANE: mockTmuxPane } } as never) : null,
 	),
 }));
 
