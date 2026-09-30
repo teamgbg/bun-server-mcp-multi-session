@@ -34,11 +34,11 @@ const logger = getLogger();
 export async function resolveCallerLabel(
 	remotePort: number,
 ): Promise<CallerInfo | null> {
-	const cached = callerCache.get(remotePort);
+	const cached = callerCache.get(String(remotePort));
 	if (cached !== undefined) return cached;
 
 	const info = await resolveCallerLabelUncached(remotePort);
-	if (info) callerCache.set(remotePort, info);
+	if (info) callerCache.set(String(remotePort), info);
 	return info;
 }
 
