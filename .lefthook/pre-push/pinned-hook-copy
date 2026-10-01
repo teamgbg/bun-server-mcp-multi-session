@@ -37,14 +37,66 @@ if [ -z "$pinned_ref" ]; then
   printf 'Run `lefthook install` in this repo and push again; without the pinned copy this push runs NO guard at all.\n' >&2
   exit 1
 fi
+
+# WHY THIS NORMALISES INSTEAD OF RE-DERIVING THE DIRECTORY NAME. The door
+# used to glob `*-$pinned_ref/`, which re-implements lefthook's own
+# `<url-basename>-<ref>` naming in the shell. That is a derivation beside a
+# derivation, and it drifted: lefthook 2.1.15 sanitises the ref when it
+# builds the checkout dir name (literal `-` escapes to `--`), so a flat ref
+# `guard-hook-transport@0.1.4` is installed at
+# `guard-hook-transport-guard--hook--transport@0.1.4`. The copy was present
+# and correct; the door looked one name over and refused a push that HAD run
+# its guard. The slashed era masked it because slash-sanitisation happened to
+# coincide with the door's spelling.
+#
+# 2.1.15, NOT 2.1.14 — an earlier comment here blamed 2.1.14 and was wrong
+# (measured: `dpkg.log` records lefthook upgraded 2.1.14 -> 2.1.15 at 06:09:11
+# on 2026-10-01, in the same unattended upgrade that restarted incus). Every
+# remotes dir created BEFORE that instant carries the raw spelling
+# (guard-hook-transport's own, created 04:17, is
+# `guard-hook-transport-guard-hook-transport@0.1.4`) and every dir created
+# after carries the doubled one, so BOTH spellings are live on this host and
+# the door must tolerate both. The attribution matters only as a record; the
+# fold below is deliberately version-agnostic, which is what makes the next
+# bump harmless.
+#
+# So neither name is trusted: the ref is matched against the installed
+# directory names after BOTH sides are folded to one canonical form (runs of
+# `-` collapse to a single `-`, and `/` folds to `-`). That tolerates either
+# sanitisation lefthook has shipped, so a version bump cannot silently
+# un-break the door, while still refusing when the only installed copy
+# belongs to a DIFFERENT ref — which is the case this door exists for.
+# NO ESCAPED PIPE and NO POSIX CHARACTER CLASSES. This string is a pkl
+# triple-quoted literal, so a backslash written here is consumed before bash
+# ever sees it: a two-branch sed pattern whose pipe was written with a
+# backslash before it rendered with the pipe bare — sed then read the pipe
+# as a flag and died with "unrecognized option" (measured: the first regen
+# of this fix failed the compile gate in bun-adapters-agreement-generation on
+# exactly that, and the door is the fail-closed component, so it must not
+# ship a construct whose escaping depends on two parsers). MEASURED TWICE,
+# the second time on this very comment: release 0.1.389 carried a version of
+# this warning that SPELLED the escaped pipe inside backticks, pkl rejected
+# the character escape at module eval and the fleet regen died before any
+# emission — the warning about the trap was the trap, and only an eval-time
+# render of this module can catch that class, which is what
+# all_repos_lefthook_tests now pins. Two `-e` expressions need no alternation
+# and no escape at all.
+fold() { printf '%s' "$1" | sed -e 's,/,-,g' -e 's,--*,-,g'; }
+want="$(fold "$pinned_ref")"
+
 missing=""
 for required in \
   .lefthook/pre-commit/scala-guard \
   .lefthook/prepare-commit-msg/co-pane \
   .lefthook/pre-push/scala-guard; do
   found=""
-  for copy in "$remotes_dir"/*-"$pinned_ref"/"$required"; do
-    if [ -f "$copy" ]; then found=1; break; fi
+  for dir in "$remotes_dir"/*/; do
+    [ -d "$dir" ] || continue
+    case "$(fold "$(basename "$dir")")" in
+      *"$want") ;;
+      *) continue ;;
+    esac
+    if [ -f "$dir$required" ]; then found=1; break; fi
   done
   if [ -z "$found" ]; then missing="$missing $required"; fi
 done
