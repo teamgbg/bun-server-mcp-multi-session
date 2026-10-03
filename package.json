@@ -57,7 +57,7 @@
     "./create-mcp-route": "./src/create-mcp-route.ts",
     "./create-mcp-route.ts": "./src/create-mcp-route.ts"
   },
-  "repository": "https://github.com/teamgbg/bun-server-mcp-multi-session",
+  "repository": "https://github.com/teamgbg/server-mcp-multi-session-ts",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   }
